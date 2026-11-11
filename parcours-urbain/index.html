@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2B8A52"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<title>Parcours urbain</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Thème clair gris-vert et beige (unique, voulu) : fond #E8EDE6, cartes #FBF9F2, vert #2B8A52, étoile #F0AE2B, beige #E7DFC8. Layout : application plein écran. Accueil en deux volets (marque + formulaire), jeu = barre d'état, plan CAD, dock de commandes. Menu déroulant, fenêtres en feuille. */
+:root{
+  color-scheme:light;
+  --paper:#E8EDE6; --panel:#FBF9F2; --soft:#F0EAD8; --line:#D5D0BA;
+  --ink:#24342B; --muted:#66756B;
+  --accent:#F0AE2B; --accent-ink:#2A2108; --bad:#D6453D;
+  --route:#2B9A5C; --rt:#1F7A47;
+  --gold-grad:linear-gradient(var(--btn),var(--btn));
+  --btn:#2B8A52; --btn-ink:#FFFFFF; --btn2:#E7DFC8; --btn2-ink:#3A4A3F;
+  --brand:#2F7F55; --brand-ink:#FBF7E8; --brand-mute:#CFE3D2;
+  --ok:#2B8A52; --mapbg:#FBFAF5; --glass:rgba(251,249,242,.95); --veil:rgba(36,52,43,.5); --shadow:0 10px 28px rgba(36,52,43,.2);
+  --f-display:'Archivo Narrow','IBM Plex Sans',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(rgba(43,138,82,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(43,138,82,.07) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;overscroll-behavior:none;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;box-sizing:border-box;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--rt);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.1;font-weight:700}
+#app{height:100%;max-width:1240px;margin:0 auto;position:relative}
+.screen{height:100%}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* ---------- boutons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 20px;border:0;border-radius:10px;background:var(--btn) var(--gold-grad);color:var(--btn-ink);font-weight:600;font-size:16px;transition:transform .08s,filter .15s}
+.btn:hover{filter:brightness(1.12)}.btn:active{transform:translateY(1px)}
+.btn.soft{background:var(--soft) none;color:var(--ink)}
+.btn.line{background:transparent none;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--muted)}
+.btn.accent{background:var(--accent);color:var(--accent-ink)}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- accueil ---------- */
+#start{display:grid;place-items:center;overflow:auto;padding-block:8px}
+.welcome{display:grid;grid-template-columns:1.05fr 1fr;width:min(940px,100%);background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+.brand{background:var(--brand);color:var(--brand-ink);padding:34px;display:flex;flex-direction:column;gap:18px;min-width:0;position:relative;
+  background-image:linear-gradient(rgba(255,255,255,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.1) 1px,transparent 1px);background-size:26px 26px}
+.mark{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px;color:var(--brand-mute)}
+.mark svg{flex:none}
+.brand h1{font-size:clamp(36px,5vw,52px);letter-spacing:-.01em}
+.brand p{margin:0;color:var(--brand-mute);max-width:34ch}
+#mini{width:100%;height:auto;max-height:190px;margin-top:auto}
+.facts{display:flex;gap:22px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.16);padding-top:14px}
+.fact b{display:block;font-family:var(--f-mono);font-size:20px;font-weight:600}
+.fact span{font-size:12px;color:var(--brand-mute);text-transform:uppercase;letter-spacing:.08em}
+.formwrap{padding:34px;display:grid;gap:18px;align-content:center}
+.formwrap h2{font-size:26px}
+.field{display:grid;gap:7px}
+.field>label,.field>span{font-weight:600;font-size:14px}
+input[type=text],input[type=password]{font:inherit;padding:13px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink);width:100%}
+input:focus{border-color:var(--rt)}
+.genders{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gender{display:grid;justify-items:center;gap:6px;padding:14px 8px;border:1.5px solid var(--line);background:var(--soft);border-radius:12px;font-weight:500}
+.gender[aria-pressed=true]{border-color:var(--rt);box-shadow:inset 0 0 0 1.5px var(--rt);background:var(--panel)}
+.gender svg{display:block}
+.err{color:var(--bad);font-size:14px;min-height:1.3em}
+.sub{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.ver{font-size:12px;color:var(--muted)}
+
+/* ---------- jeu ---------- */
+#game{display:none;grid-template-rows:auto auto 1fr auto;gap:8px}
+#game.on{display:grid}
+.bar{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 10px 8px 12px;box-shadow:0 2px 8px rgba(36,52,43,.08)}
+.player{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 140px}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none}
+.pname{font-family:var(--f-display);font-weight:700;font-size:19px;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.psub{font-size:12px;color:var(--muted);line-height:1.2}
+.stats{display:flex;gap:6px;flex:0 1 auto}
+.stat{background:var(--soft);border-radius:10px;padding:4px 12px;display:grid;line-height:1.15;min-width:74px}
+.stat .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-family:var(--f-mono);font-weight:600;font-size:16px;font-variant-numeric:tabular-nums}
+.lives{display:flex;gap:5px;align-items:center;height:22px}
+.life{width:13px;height:13px;border-radius:50%;background:var(--btn)}
+.life.off{background:transparent;box-shadow:inset 0 0 0 2px var(--muted)}
+.menubtn{border:0;background:var(--btn) var(--gold-grad);color:var(--btn-ink);border-radius:10px;padding:10px 14px;font-weight:600;display:flex;gap:8px;align-items:center}
+.track{position:relative;height:6px;background:var(--line);border-radius:3px;margin:2px 6px}
+.track>i{position:absolute;inset:0 auto 0 0;width:0;background:var(--gold-grad);border-radius:3px}
+.track>b{position:absolute;top:-3px;width:12px;height:12px;border-radius:50%;background:var(--panel);box-shadow:inset 0 0 0 2.5px var(--btn);transform:translateX(-50%)}
+.track>b.done{background:var(--btn);box-shadow:inset 0 0 0 2.5px var(--btn)}
+.stage{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--mapbg);min-height:220px}
+canvas#map{position:absolute;inset:0;width:100%;height:100%;display:block}
+.banner{position:absolute;top:12px;left:12px;background:var(--glass);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:12px;padding:9px 14px 9px 12px;max-width:min(78%,360px);display:flex;gap:11px;align-items:center;box-shadow:0 4px 16px rgba(36,52,43,.16)}
+.banner .pin{flex:none;color:var(--accent)}
+.banner .rue{font-family:var(--f-display);font-weight:700;font-size:19px;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.banner .qu{font-size:12.5px;color:var(--muted);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banner .snd{font-size:11.5px;color:var(--rt);margin-top:2px;display:flex;gap:5px;align-items:center}
+.banner.pulse{animation:pop .45s ease}
+@keyframes pop{0%{transform:translateY(-6px);opacity:.4}100%{transform:none;opacity:1}}
+#eye{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:9px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:11px 20px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.28);white-space:nowrap;max-width:92%}
+#eye.on{display:flex}
+.toast{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);border-radius:999px;padding:8px 16px;font-size:14px;display:none;max-width:92%;text-align:center}
+.toast.on{display:block}
+.menu{position:absolute;top:8px;right:8px;z-index:5;min-width:230px;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:6px;display:grid;gap:2px}
+.menu button{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:0;background:transparent;border-radius:9px;padding:11px 12px;font-weight:500}
+.menu button:hover{background:var(--soft)}
+.menu .on-tag{font-size:12px;font-weight:600;color:var(--ok)}
+.menu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
+.dock{display:grid;grid-template-columns:1fr 1.4fr;gap:10px}
+.dock button{padding:17px;border:0;border-radius:14px;font-size:18px;font-weight:600;user-select:none;-webkit-user-select:none;touch-action:none;display:flex;align-items:center;justify-content:center;gap:10px}
+#btnBack{background:var(--btn2) none;color:var(--btn2-ink);box-shadow:inset 0 0 0 1px var(--line)}
+#btnFwd{background:var(--btn) var(--gold-grad);color:var(--btn-ink);box-shadow:none}
+.dock button:active,.dock button.held{filter:brightness(.82);transform:translateY(1px)}
+.keys{display:none;font-size:12px;color:var(--muted);text-align:center;margin-top:-2px}
+@media (hover:hover) and (pointer:fine){.keys{display:block}}
+
+/* ---------- fenêtres ---------- */
+.modal{position:fixed;inset:0;background:var(--veil);display:none;align-items:center;justify-content:center;padding:max(14px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) max(14px,env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));z-index:50;overflow:auto;backdrop-filter:blur(2px)}
+.modal.on{display:flex}
+.sheet{background:var(--panel);border-radius:18px;width:min(600px,100%);max-height:100%;overflow:auto;box-shadow:var(--shadow);display:flex;flex-direction:column;animation:rise .22s ease-out}
+@keyframes rise{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px 0}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--soft);color:var(--ink);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.chip i{width:8px;height:8px;border-radius:2px;background:var(--accent);transform:rotate(45deg)}
+.step{font-size:12.5px;color:var(--muted)}
+.x{border:0;background:var(--soft);width:34px;height:34px;border-radius:50%;font-size:18px;line-height:1;display:grid;place-items:center}
+.sheet-body{padding:12px 20px 4px;display:grid;gap:14px}
+.sheet h2{font-size:30px}
+.fig{margin:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--mapbg)}
+.fig canvas{width:100%;height:auto;display:block}
+.fig figcaption{background:var(--soft);padding:6px 12px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:10px}
+.lead{margin:0;white-space:pre-line;color:var(--ink)}
+.qbox{background:var(--soft);border-radius:14px;padding:14px;display:grid;gap:12px}
+.qlabel{font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--rt)}
+.qbox p{margin:0;font-weight:600;font-size:17px;line-height:1.35}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;padding:11px 12px;border:1.5px solid var(--line);background:var(--panel);border-radius:11px;font-weight:500}
+.opt:hover:not(:disabled){border-color:var(--rt)}
+.opt .l{flex:none;width:26px;height:26px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:12px;font-weight:700}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--panel))}
+.opt.right .l{background:var(--ok);color:#fff}
+.opt.wrong{opacity:.5}
+.opt.wrong .l{background:var(--bad);color:#fff}
+.fb{min-height:1.3em;font-size:14.5px;font-weight:500}.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+.sheet-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 20px 18px;position:sticky;bottom:0;background:var(--panel);border-top:1px solid var(--line);margin-top:8px}
+.sheet-foot .grow{flex:1}
+.kvs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kv{background:var(--soft);border-radius:12px;padding:10px 12px}
+.kv b{display:block;font-family:var(--f-mono);font-size:22px;font-weight:600}
+.kv span{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+th,td{padding:9px 6px;text-align:left;border-bottom:1px solid var(--line)}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.me td{background:color-mix(in srgb,var(--rt) 12%,transparent)}
+.tbl{overflow:auto;max-height:50vh;margin:0 -6px;padding:0 6px}
+.rk{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--soft);font-size:12px;font-weight:700}
+.rk.g1{background:#F0C84A;color:#2a2108}.rk.g2{background:#b9bec3;color:#1f2326}.rk.g3{background:#c58a5e;color:#25140a}
+.del{border:0;background:transparent;color:var(--bad);font-weight:600;font-size:13px;padding:4px 8px;border-radius:8px}
+.del:hover{background:var(--soft)}
+.adminbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--soft);border-radius:10px;padding:8px 10px;font-size:13px}
+.adminbar input{max-width:200px;padding:7px 10px}
+#editor{position:fixed;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:40;background:var(--panel);border:2px solid var(--accent);border-radius:14px;padding:12px;display:none;gap:8px;box-shadow:var(--shadow)}
+#editor.on{display:grid}
+#editor textarea{font:13px/1.4 var(--f-mono);width:100%;height:70px;background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+
+@media (max-width:760px){
+  .welcome{grid-template-columns:1fr}
+  .brand{padding:22px}.brand p{max-width:none}#mini{max-height:120px}.formwrap{padding:22px}
+  .bar{padding:8px}.stat{min-width:0;padding:4px 10px}.menubtn span{display:none}.stats{order:3;width:100%}.stats .stat{flex:1}
+  .sheet h2{font-size:25px}.sheet-body,.sheet-head{padding-left:16px;padding-right:16px}.sheet-foot{padding:12px 16px 16px}
+  .kvs{gap:6px}.kv b{font-size:18px}
+}
+@media (max-height:520px) and (orientation:landscape){
+  body{padding-block:6px}.dock button{padding:9px;font-size:16px}.keys{display:none}.stats{order:0;width:auto}.stat{padding:2px 10px}
+  .welcome{grid-template-columns:1fr 1fr}.brand,.formwrap{padding:16px}#mini{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head><body>
+
+<div id="app" lang="fr">
+  <!-- ===== ACCUEIL ===== -->
+  <section id="start" class="screen">
+    <div class="welcome">
+      <div class="brand">
+        <div class="mark"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="1" y="1" width="24" height="24" rx="6" stroke="currentColor" stroke-width="1.6"/><path d="M5 17 L11 12 L16 14 L21 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="21" cy="8" r="2.2" fill="#F0AE2B"/></svg><span id="tSub"></span></div>
+        <h1 id="tTitle"></h1>
+        <p id="tIntro"></p>
+        <svg id="mini" viewBox="0 0 300 150" aria-hidden="true"></svg>
+        <div class="facts" id="facts"></div>
+      </div>
+      <form class="formwrap" id="startForm" autocomplete="off">
+        <h2>Prêt à marcher ?</h2>
+        <div class="field">
+          <label for="pname">Nom du joueur</label>
+          <input type="text" id="pname" maxlength="24" placeholder="Prénom ou pseudo" enterkeyhint="go">
+        </div>
+        <div class="field">
+          <span id="glabel">Genre (choisit l'icône sur le plan)</span>
+          <div class="genders" role="group" aria-labelledby="glabel">
+            <button type="button" class="gender" id="gM" aria-pressed="true"><svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#2f7fc1"/><circle cx="15" cy="11" r="4.6" fill="#fff"/><path d="M6.5 24a8.5 8.5 0 0 1 17 0z" fill="#fff"/></svg>Homme</button>
+            <button type="button" class="gender" id="gF" aria-pressed="false"><svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="#c2428a"/><circle cx="15" cy="11" r="4.6" fill="#fff"/><path d="M15 17 L8 25 H22z" fill="#fff"/></svg>Femme</button>
+          </div>
+        </div>
+        <div class="err" id="startErr" role="alert"></div>
+        <button class="btn block" type="submit">Commencer la balade</button>
+        <div class="sub"><button class="btn line" type="button" id="startBoard">Classement</button><span class="ver" id="ver"></span></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== JEU ===== -->
+  <section id="game" class="screen">
+    <header class="bar">
+      <div class="player"><div class="avatar" id="avatar"></div><div style="min-width:0"><div class="pname" id="whoName"></div><div class="psub" id="whoSub"></div></div></div>
+      <div class="stats">
+        <div class="stat"><span class="k">Temps</span><span class="v" id="clock">00:00</span></div>
+        <div class="stat"><span class="k">Distance</span><span class="v" id="dist">0 m</span></div>
+        <div class="stat" id="livesBox"><span class="k">Essais</span><div class="lives" id="lives" aria-label="Essais restants"></div></div>
+      </div>
+      <button class="menubtn" id="btnMenu" aria-haspopup="true" aria-expanded="false" aria-controls="menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 5h14M2 9h14M2 13h14"/></svg><span>Menu</span></button>
+    </header>
+    <div class="track" id="track"><i id="prog"></i></div>
+    <div class="stage" id="stage">
+      <canvas id="map"></canvas>
+      <div class="banner" id="banner" aria-live="polite">
+        <svg class="pin" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+        <div style="min-width:0"><div class="rue" id="bRue">—</div><div class="qu" id="bQu"></div><div class="snd" id="bSnd"></div></div>
+      </div>
+      <div class="toast" id="toast" role="status"></div>
+      <button id="eye" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3.2"/></svg><span id="eyeLabel"></span></button>
+      <div class="menu" id="menu" role="menu" hidden>
+        <button data-act="sound" role="menuitem"><span>Son</span><span class="on-tag" id="mSound">activé</span></button>
+        <button data-act="view" role="menuitem"><span id="mView">Voir le plan entier</span></button>
+        <button data-act="board" role="menuitem"><span>Classement</span></button>
+        <button data-act="full" role="menuitem"><span>Plein écran</span></button>
+        <hr>
+        <button data-act="restart" role="menuitem"><span>Recommencer</span></button>
+        <button data-act="edit" role="menuitem" id="mEdit" hidden><span>Éditeur (admin)</span><span class="on-tag" id="mEditTag"></span></button>
+      </div>
+    </div>
+    <div>
+      <div class="dock">
+        <button id="btnBack" type="button"><svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><path d="M12 2 4 9l8 7z"/></svg>Reculer</button>
+        <button id="btnFwd" type="button">Avancer<svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><path d="M6 2l8 7-8 7z"/></svg></button>
+      </div>
+      <div class="keys">Flèches ou W A S D du clavier</div>
+    </div>
+  </section>
+
+  <!-- ===== Point d'analyse ===== -->
+  <div class="modal" id="mCp"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cpT">
+    <div class="sheet-head"><span class="chip"><i></i><span id="cpTag"></span></span><span class="step" id="cpStep"></span></div>
+    <div class="sheet-body">
+      <h2 id="cpT"></h2>
+      <figure class="fig"><canvas id="cpImg" width="640" height="360"></canvas><figcaption><span id="cpCap"></span><span>Plan / croquis</span></figcaption></figure>
+      <p class="lead" id="cpP"></p>
+      <div class="qbox" id="cpQBox"><div class="qlabel">Question</div><p id="cpQ"></p><div class="opts" id="cpOpts"></div><div class="fb" id="cpFb" role="status"></div></div>
+    </div>
+    <div class="sheet-foot"><div class="lives" id="cpLives" aria-label="Essais restants"></div><button class="btn grow" id="cpNext">Continuer le parcours</button></div>
+  </div></div>
+  <!-- ===== Repère ===== -->
+  <div class="modal" id="mInfo"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="inT">
+    <div class="sheet-head"><span class="chip"><i></i>Repère</span><button class="x" id="inX" aria-label="Fermer">&times;</button></div>
+    <div class="sheet-body">
+      <h2 id="inT"></h2>
+      <figure class="fig"><canvas id="inImg" width="640" height="360"></canvas><figcaption><span id="inCap"></span><span>Plan / croquis</span></figcaption></figure>
+      <p class="lead" id="inP"></p>
+    </div>
+    <div class="sheet-foot"><button class="btn grow" id="inClose">Fermer</button></div>
+  </div></div>
+  <!-- ===== Perdu ===== -->
+  <div class="modal" id="mLose"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="loseT">
+    <div class="sheet-head"><span class="chip"><i></i>Parcours interrompu</span></div>
+    <div class="sheet-body"><h2 id="loseT">Essais épuisés</h2><p class="lead">Vous avez fait trop d'erreurs. Le parcours recommence depuis le début avec un nouveau chrono. Relisez les textes des points d'analyse, les réponses s'y trouvent.</p></div>
+    <div class="sheet-foot"><button class="btn grow" id="loseBtn">Recommencer le parcours</button></div>
+  </div></div>
+  <!-- ===== Fin ===== -->
+  <div class="modal" id="mWin"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="winT">
+    <div class="sheet-head"><span class="chip"><i></i>Parcours terminé</span></div>
+    <div class="sheet-body">
+      <h2 id="winT"></h2>
+      <div class="kvs"><div class="kv"><b id="wTime"></b><span>Temps</span></div><div class="kv"><b id="wDist"></b><span>Distance</span></div><div class="kv"><b id="wRank">—</b><span>Rang</span></div></div>
+      <p class="lead" id="winMsg" style="color:var(--muted)"></p>
+    </div>
+    <div class="sheet-foot"><button class="btn" id="winAgain">Rejouer</button><button class="btn soft" id="winBack">Revenir sur le parcours</button><button class="btn line" id="winBoard">Classement</button></div>
+  </div></div>
+  <!-- ===== Classement ===== -->
+  <div class="modal" id="mBoard"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="bT">
+    <div class="sheet-head"><span class="chip"><i></i>Classement</span><button class="x" id="boardX" aria-label="Fermer">&times;</button></div>
+    <div class="sheet-body">
+      <h2 id="bT">Meilleurs temps</h2>
+      <div class="adminbar" id="adminBar" hidden><b>Mode admin</b><span id="adminHint">Supprimez une ligne avec le bouton rouge.</span><input type="password" id="adminCode" placeholder="Code admin" autocomplete="off" hidden></div>
+      <div class="tbl"><table><thead><tr><th>#</th><th>Nom</th><th class="n">Temps</th><th class="n">Distance</th><th class="adm" hidden></th></tr></thead><tbody id="boardBody"></tbody></table></div>
+      <div class="ver" id="boardSrc"></div>
+    </div>
+    <div class="sheet-foot"><button class="btn soft" id="boardRefresh">Actualiser</button><button class="btn grow" id="boardClose">Fermer</button></div>
+  </div></div>
+
+  <div id="editor">
+    <div style="font-size:14px"><b>Éditeur</b> : cliquez sur le plan, chaque clic ajoute <code>[x, y]</code>. Copiez dans <code>config.js</code>.</div>
+    <textarea id="edOut" readonly></textarea>
+    <div class="row"><button class="btn soft" id="edCopy">Copier</button><button class="btn soft" id="edUndo">Annuler le dernier</button><button class="btn soft" id="edClear">Effacer</button><button class="btn line" id="edClose">Quitter l'éditeur</button></div>
+  </div>
+</div>
+<script src="config.js"></script>
+<script src="sons.js"></script>
+<script src="game.js"></script>
+</body></html>

@@ -1,0 +1,47 @@
+PARCOURS URBAIN - mode d'emploi
+================================
+FICHIERS
+  config.js    -> A MODIFIER : tout le contenu (titres, plan, tracé, points + questions, repères, rues, sons, échelle)
+  images/      -> A MODIFIER : plan.jpg + vos croquis (cp1.jpg ...)   (icon-*.png = icône de l'application)
+  sons/        -> (à créer) vos mp3 facultatifs
+  sons.js      -> avancé : réglage des sons synthétisés
+  supabase.sql -> classement partagé hors Claude (voir plus bas)
+  index.html, game.js, sw.js, manifest.webmanifest -> ne pas toucher
+
+ENTRER EN ADMIN
+  Ajoutez  #admin  à la fin de l'adresse de la page :  .../index.html#admin
+  (avec codeAdmin:"abc" dans config.js : .../index.html#admin-abc).
+  Vous voyez alors : le bouton "Éditeur (admin)" dans le Menu, et le bouton rouge "Supprimer" dans le Classement.
+  Les joueurs qui n'ajoutent pas #admin ne voient rien de tout cela.
+
+DISTANCE
+  Le jeu affiche la distance marchée (aller-retour compris) et l'enregistre dans le classement.
+  Réglez l'échelle : metresParPixel dans config.js (mesurez sur l'échelle graphique de votre plan).
+
+RUES / QUARTIERS
+  Section "lieux" de config.js : {x,y,rue,quartier}. Le bandeau en haut du plan affiche le plus proche.
+
+CHANGER LE PLAN GENERAL
+  Le tracé noir n'est PAS dans l'image : c'est la liste "trace" de config.js.
+  1. Remplacez images/plan.jpg (le plan actuel fait 2000 x 1538 px). 2. Ouvrez index.html#admin > Commencer > Menu > Éditeur.
+  3. Cliquez le long du chemin, dans l'ordre (ligne rouge pointillée), puis Copier.
+  4. Collez dans "trace: [ ... ]". Refaites pour points, reperes, ambiances, lieux.
+  Si votre plan contient déjà une ligne dessinée : afficherTrace:false.
+
+POINTS D'ANALYSE : "points" -> titre, tag, texte, image, question, choix:[...], reponse (0 = première), explication.
+  3 erreurs au total (essais) = le parcours recommence.   REPERES (bouton oeil) : "reperes".
+SONS : "ambiances" (son = marche|police|ecole|calme|circulation) et "fichiersSon" pour vos mp3.
+
+CLASSEMENT POUR TOUS LES AMIS
+  A) Lien Claude (artéfact) : le classement est partagé automatiquement. Vos amis doivent avoir un compte Claude
+     et recevoir l'accès "Contributeur" via le menu Partager. Un joueur = une ligne (son meilleur temps).
+     En admin (#admin) vous supprimez les lignes. Seuls vous/les éditeurs peuvent supprimer.
+  B) Lien public gratuit (Netlify...) : créez un projet gratuit sur supabase.com, collez supabase.sql dans SQL Editor
+     (remplacez MON_CODE_ADMIN), puis mettez l'URL et la clé "anon" dans config.js > classement.
+     Tout le monde peut jouer sans compte. Pour supprimer : #admin, tapez votre code dans le champ "Code admin".
+     (Chacun peut tricher en envoyant un faux temps : c'est un jeu entre amis.)
+
+APPLICATION : une fois publié sur Netlify, ouvrez le lien sur téléphone > "Ajouter à l'écran d'accueil".
+  Le jeu s'ouvre alors en plein écran comme une vraie application et fonctionne hors connexion.
+
+PUBLIER GRATUITEMENT : glissez TOUT LE DOSSIER sur https://app.netlify.com/drop
